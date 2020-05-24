@@ -51,6 +51,7 @@ var createTaskEl = function(taskDataObj) {
   listItemEl.className = "task-item";
 
   listItemEl.setAttribute("data-task-id", taskIdCounter);
+  listItemEl.setAttribute("draggable", "true");
 
   var taskInfoEl = document.createElement("div");
   taskInfoEl.className = "task-info";
@@ -120,8 +121,6 @@ var taskStatusChangeHandler = function(event) {
   }
 }
 
-formEl.addEventListener("submit", taskFormHandler);
-
 var taskButtonHandler = function(event) {
   var targetEl = event.target;
 
@@ -154,6 +153,51 @@ var editTask = function(taskId) {
   formEl.setAttribute("data-task-id", taskId);
 }
 
+var dragTaskHandler = function(event) {
+  var taskId = event.target.getAttribute("data-task-id");
+  event.dataTransfer.setData("text/plain", taskId);
+
+  var getId = event.dataTransfer.getData("text/plain");
+}
+
+var dropZoneDragHandler = function(event) {
+  var taskListEl = event.target.closest(".task-list");
+  if (taskListEl) {
+    event.preventDefault();
+  }
+}
+
+var dropTaskHandler = function(event) {
+  event.preventDefault();
+
+  var id = event.dataTransfer.getData("text/plain");
+
+  var draggableElement = document.querySelector("[data-task-id='" + id + "']");
+
+  var dropZoneEl = event.target.closest(".task-list");
+  var statusType = dropZoneEl.id;
+
+  var statusSelectEl = draggableElement.querySelector("select[name='status-change']");
+
+  if (statusType === "tasks-to-do") {
+    statusSelectEl.selectedIndex = 0;
+  } else if (statusType === "tasks-in-progress") {
+    statusSelectEl.selectedIndex = 1;
+  } else if (statusType === "tasks-completed") {
+    statusSelectEl.selectedIndex = 2;
+  }
+
+  dropZoneEl.appendChild(draggableElement);
+}
+
+formEl.addEventListener("submit", taskFormHandler);
+
 pageContentEl.addEventListener("click", taskButtonHandler);
 
 pageContentEl.addEventListener("change", taskStatusChangeHandler);
+
+pageContentEl.addEventListener("dragstart", dragTaskHandler);
+
+pageContentEl.addEventListener("dragover", dropZoneDragHandler);
+
+pageContentEl.addEventListener("drop", dropTaskHandler);
