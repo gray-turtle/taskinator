@@ -104,6 +104,22 @@ var createTaskActions = function(taskId) {
   return actionContainerEl;
 }
 
+var taskStatusChangeHandler = function(event) {
+  var taskId = event.target.getAttribute("data-task-id");
+
+  var statusValue = event.target.value.toLowerCase();
+
+  var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
+
+  if (statusValue === "to do") {
+    tasksToDoEl.appendChild(taskSelected);
+  } else if (statusValue === "in progress") {
+    tasksInProgressEl.appendChild(taskSelected);
+  } else if (statusValue === "completed") {
+    tasksCompletedEl.appendChild(taskSelected);
+  }
+}
+
 formEl.addEventListener("submit", taskFormHandler);
 
 var taskButtonHandler = function(event) {
@@ -139,3 +155,5 @@ var editTask = function(taskId) {
 }
 
 pageContentEl.addEventListener("click", taskButtonHandler);
+
+pageContentEl.addEventListener("change", taskStatusChangeHandler);
